@@ -1,0 +1,710 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Weather Wise</title>
+<meta name="theme-color" content="#1a3a2a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Weather Wise">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<meta name="description" content="Weather Wise from The Outdoor Practice. Check the forecast for your spot, get a clear go or no-go, and tips for every kind of weather.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: one calm column. Header, three tabs, then a verdict card that leads the forecast. */
+:root {
+  --bg: #f5f0e8;
+  --surface: #fbf8f2;
+  --ink: #26302a;
+  --muted: #6b7068;
+  --line: #ddd5c7;
+  --forest: #1a3a2a;
+  --moss: #4f6b42;
+  --ember: #c4622a;
+  --moss-soft: rgba(79, 107, 66, 0.10);
+  --ember-soft: rgba(196, 98, 42, 0.10);
+  --go: #3f6b35; --go-bg: rgba(63, 107, 53, 0.10);
+  --care: #9a6a12; --care-bg: rgba(196, 140, 30, 0.13);
+  --stop: #a3332a; --stop-bg: rgba(163, 51, 42, 0.10);
+  --focus: #c4622a;
+  --display: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
+  --body: "IBM Plex Sans", -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121915; --surface: #19221c; --ink: #e6e0d4; --muted: #9ca296; --line: #2d3a31;
+    --forest: #d3e2cb; --moss: #8fae7d; --ember: #e08a5a;
+    --moss-soft: rgba(143, 174, 125, 0.12); --ember-soft: rgba(224, 138, 90, 0.14);
+    --go: #9cc48c; --go-bg: rgba(156, 196, 140, 0.12);
+    --care: #e3b55a; --care-bg: rgba(227, 181, 90, 0.13);
+    --stop: #ec8a7f; --stop-bg: rgba(236, 138, 127, 0.13);
+    --focus: #e08a5a;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-top: calc(20px + env(safe-area-inset-top, 0px));
+  padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+h1, h2, h3 { font-family: var(--display); color: var(--forest); font-weight: 600; text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: 2.4rem; font-weight: 500; }
+h2 { font-size: 1.7rem; font-weight: 500; }
+h3 { font-size: 1.25rem; }
+p { margin: 0; }
+a { color: var(--moss); }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+
+.brand { display: flex; align-items: center; gap: 10px; color: var(--forest); }
+.brand svg { width: 28px; height: 28px; flex: none; }
+.eyebrow { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; color: var(--forest); }
+.head { display: flex; flex-direction: column; gap: 10px; }
+.tagline { font-family: var(--display); font-style: italic; font-size: 1.15rem; color: var(--ember); }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
+.tab { background: none; border: 0; padding: 10px 14px 9px; cursor: pointer; color: var(--muted); font-size: 0.9rem; font-weight: 500; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tab[aria-selected="true"] { color: var(--forest); border-bottom-color: var(--ember); }
+
+.btn { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 9px 18px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-size: 0.9rem; font-weight: 500; }
+.btn:hover { border-color: var(--moss); }
+.btn.primary { background: var(--forest); color: var(--bg); border-color: var(--forest); }
+.btn.small { padding: 6px 13px; font-size: 0.84rem; }
+.btn:disabled { opacity: 0.6; cursor: default; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.spread { justify-content: space-between; }
+.sheet { display: flex; flex-direction: column; gap: 22px; }
+.label { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; color: var(--forest); }
+.toast { font-size: 0.84rem; color: var(--muted); }
+.err { color: var(--stop); }
+
+/* Location + when */
+.panel { display: flex; flex-direction: column; gap: 12px; }
+.search { display: flex; gap: 8px; }
+.search input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 999px; padding: 9px 16px; background: var(--surface); }
+.search input:focus { outline: none; border-color: var(--moss); }
+.results { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface); }
+.results button { text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); padding: 10px 14px; cursor: pointer; }
+.results button:last-child { border-bottom: 0; }
+.results button:hover { background: var(--moss-soft); }
+.results small { color: var(--muted); }
+.place { font-family: var(--display); font-size: 1.35rem; font-weight: 600; color: var(--forest); }
+.when { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 10px; }
+.when select { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--surface); }
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+
+/* Verdict */
+.verdict { border-radius: 16px; padding: 20px 20px 18px; display: flex; flex-direction: column; gap: 12px; border: 1px solid transparent; }
+.verdict.go { background: var(--go-bg); border-color: var(--go); }
+.verdict.care { background: var(--care-bg); border-color: var(--care); }
+.verdict.stop { background: var(--stop-bg); border-color: var(--stop); }
+.v-top { display: flex; align-items: center; gap: 14px; }
+.v-dot { width: 18px; height: 18px; border-radius: 50%; flex: none; }
+.go .v-dot { background: var(--go); } .care .v-dot { background: var(--care); } .stop .v-dot { background: var(--stop); }
+.v-title { font-family: var(--display); font-size: 2rem; font-weight: 600; line-height: 1.05; }
+.go .v-title { color: var(--go); } .care .v-title { color: var(--care); } .stop .v-title { color: var(--stop); }
+.v-sub { font-size: 0.88rem; color: var(--muted); }
+.reasons { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.reasons li { display: grid; grid-template-columns: 10px 1fr; gap: 10px; align-items: baseline; font-size: 0.93rem; }
+.reasons li i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; transform: translateY(-1px); }
+.reasons li.l2 i { background: var(--stop); } .reasons li.l1 i { background: var(--care); } .reasons li.l0 i { background: var(--go); }
+.reasons a { font-size: 0.84rem; white-space: nowrap; }
+
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.fact { background: var(--surface); padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.fact b { font-family: var(--display); font-size: 1.45rem; font-weight: 600; color: var(--forest); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.fact span { font-size: 0.74rem; color: var(--muted); }
+
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.86rem; font-variant-numeric: tabular-nums; }
+th { text-align: left; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--forest); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; background: var(--surface); }
+td { padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+td.l1 { color: var(--care); font-weight: 600; } td.l2 { color: var(--stop); font-weight: 600; }
+
+.also { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; border: 1px dashed var(--line); border-radius: 12px; }
+.also ul { margin: 0; padding-left: 1.1em; display: flex; flex-direction: column; gap: 4px; font-size: 0.9rem; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 6px 13px; cursor: pointer; font-size: 0.86rem; }
+.chip[aria-pressed="true"] { background: var(--moss); color: var(--bg); border-color: var(--moss); }
+
+/* Guide */
+.guide { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+details { border-bottom: 1px solid var(--line); scroll-margin-top: 16px; }
+summary { cursor: pointer; padding: 14px 2px; list-style: none; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+summary::-webkit-details-marker { display: none; }
+summary h3 { font-size: 1.35rem; }
+summary .plus { color: var(--ember); font-size: 1.2rem; transition: transform .2s; }
+details[open] summary .plus { transform: rotate(45deg); }
+.g-body { padding: 0 2px 20px; display: flex; flex-direction: column; gap: 10px; max-width: 62ch; }
+.g-lead { font-family: var(--display); font-style: italic; color: var(--ember); font-size: 1.1rem; }
+.g-body ul { margin: 0; padding-left: 1.1em; display: flex; flex-direction: column; gap: 7px; }
+.g-body li::marker { color: var(--ember); }
+.g-body strong { color: var(--forest); font-weight: 600; }
+.g-sub { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; color: var(--forest); margin-top: 6px; }
+.callout { border-left: 3px solid var(--stop); padding: 4px 0 4px 12px; color: var(--ink); }
+.callout strong { color: var(--stop); }
+
+/* Checklist */
+.check { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+.check label { display: flex; gap: 12px; align-items: flex-start; padding: 11px 2px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.check input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--moss); flex: none; }
+.check small { display: block; color: var(--muted); font-size: 0.82rem; }
+textarea.msg { width: 100%; min-height: 150px; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; background: var(--surface); line-height: 1.6; resize: vertical; }
+
+.foot { font-size: 0.78rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; display: flex; flex-direction: column; gap: 4px; }
+
+@media (max-width: 520px) {
+  h1 { font-size: 2rem; }
+  .when { grid-template-columns: 1fr 1fr; }
+  .when .field:first-child { grid-column: 1 / -1; }
+  .facts { grid-template-columns: repeat(2, 1fr); }
+  .v-title { font-size: 1.7rem; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="head">
+    <div class="brand">
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="45" fill="none" stroke="var(--moss)" stroke-width="3.5"/>
+        <g stroke="currentColor" stroke-width="3.5" fill="none">
+          <line x1="50" y1="12" x2="50" y2="88"/>
+          <polyline points="32.5,47.5 50,30 67.5,47.5"/>
+          <polyline points="36,59 50,45 64,59"/>
+        </g>
+      </svg>
+      <span class="eyebrow">The Outdoor Practice</span>
+    </div>
+    <h1>Weather Wise</h1>
+    <p class="tagline">Read the sky before you go.</p>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button class="tab" role="tab" data-view="forecast" aria-selected="true">Forecast</button>
+    <button class="tab" role="tab" data-view="tips" aria-selected="false">Weather tips</button>
+    <button class="tab" role="tab" data-view="ready" aria-selected="false">Before you go</button>
+  </nav>
+
+  <main id="view" aria-live="polite"></main>
+
+  <footer class="foot">
+    <span>A guide, not a guarantee. Weather changes. Use your own judgement and check official warnings.</span>
+    <span>Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0). Place search uses GeoNames.</span>
+  </footer>
+</div>
+
+<template id="tips-tpl">
+  <div class="guide">
+    <details id="t-wind">
+      <summary><h3>Wind</h3><span class="plus">+</span></summary>
+      <div class="g-body">
+        <p class="g-lead">Trees are the main risk. Look up as well as ahead.</p>
+        <p class="g-sub">How strong is strong?</p>
+        <ul>
+          <li><strong>Under 32 mph gusts.</strong> Fine for most woods. Watch for dead branches that have already come down.</li>
+          <li><strong>32 to 38 mph (near gale).</strong> Whole trees sway. Go with care: keep away from big old trees, dead wood and leaning trunks. Choose a clearing or woodland edge.</li>
+          <li><strong>39 mph and over (gale).</strong> Twigs and branches start to break. Not in the woods. Many sites close from 40 mph, and fully from around 45.</li>
+        </ul>
+        <p class="g-sub">Tips</p>
+        <ul>
+          <li>Gusts matter more than the average speed. Check the gust figure.</li>
+          <li>Conifers and trees in full leaf catch more wind. Wet ground loosens roots.</li>
+          <li>Keep shelters low and well tied. A tarp in a gust becomes a sail.</li>
+          <li>Wind makes it feel much colder. Check the "feels like" temperature too.</li>
+          <li>Fires and wind don't mix. Keep fires small, or skip them.</li>
+        </ul>
+        <p class="callout"><strong>After a storm,</strong> stay out until the woods have been checked. Trees blown over but caught in others, called hung-up trees, can fall with little or no warning. Loose limbs can drop days later.</p>
+      </div>
+    </details>
+    <details id="t-thunder">
+      <summary><h3>Thunder and lightning</h3><span class="plus">+</span></summary>
+      <div class="g-body">
+        <p class="g-lead">If you can hear thunder, lightning is close enough to reach you.</p>
+        <ul>
+          <li><strong>Forecast thunder?</strong> Move the session or go somewhere with proper shelter nearby.</li>
+          <li><strong>Hear thunder?</strong> Head for a building or a car with a hard roof straight away.</li>
+          <li><strong>Don't shelter under trees,</strong> lone ones especially. Stay away from tall objects and anything that conducts electricity.</li>
+          <li><strong>Get off high ground</strong> and away from open water.</li>
+          <li><strong>Caught in the open?</strong> Crouch low with your head tucked, keeping as little of you touching the ground as you can.</li>
+          <li><strong>Wait 30 minutes</strong> after the last rumble before going back out.</li>
+        </ul>
+      </div>
+    </details>
+    <details id="t-cold">
+      <summary><h3>Cold</h3><span class="plus">+</span></summary>
+      <div class="g-body">
+        <p class="g-lead">Sitting still is where people get cold. Plan for it before anyone feels it.</p>
+        <ul>
+          <li><strong>Layers on before you sit,</strong> not when you're already cold. Hat, gloves, a warm mid layer and something windproof.</li>
+          <li><strong>Insulate from the ground.</strong> A sit mat makes a big difference.</li>
+          <li><strong>Keep it moving.</strong> Shorter sits, with walking or movement in between.</li>
+          <li><strong>Warm drinks and snacks.</strong> Food is fuel for staying warm.</li>
+          <li><strong>Wet plus wind is the danger mix.</strong> Damp clothes lose their warmth fast.</li>
+          <li><strong>Carry spares.</strong> Hats, gloves and a spare layer for anyone who comes underdressed.</li>
+        </ul>
+        <p class="g-sub">Signs someone is getting too cold</p>
+        <ul>
+          <li>Shivering, cold and pale skin, tiredness</li>
+          <li>Slurred speech, fast breathing, confusion</li>
+          <li>Fumbling hands, clumsiness, going quiet</li>
+        </ul>
+        <p class="callout"><strong>If someone stops shivering</strong> but is still cold, gets confused or drowsy, it's getting serious. Call 999. Get them out of the wind, off the cold ground, into dry layers, and give a warm non-alcoholic drink and something sugary if they can swallow normally. Don't rub their limbs or use direct heat.</p>
+        <p>For the people who don't notice they're cold, see <a href="#t-notice" data-jump="t-notice">Who might not notice</a>.</p>
+      </div>
+    </details>
+    <details id="t-heat">
+      <summary><h3>Heat and sun</h3><span class="plus">+</span></summary>
+      <div class="g-body">
+        <p class="g-lead">Woods give shade, but heat still builds. Slow down with it.</p>
+        <ul>
+          <li><strong>Go early or late.</strong> Avoid roughly 11am to 3pm on hot days.</li>
+          <li><strong>Shade and water.</strong> Pick a shady spot, and carry more water than you think.</li>
+          <li><strong>Sun protection</strong> when UV is high: hat, sun cream, light long sleeves.</li>
+          <li><strong>Less effort.</strong> Gentle pace, more rest, shorter sessions.</li>
+          <li><strong>Wildfire risk.</strong> No fires or stoves in dry spells. Check local restrictions.</li>
+        </ul>
+        <p class="g-sub">Signs of heat exhaustion</p>
+        <ul>
+          <li>Headache, dizziness, feeling sick, tiredness</li>
+          <li>Heavy sweating, pale clammy skin, cramps</li>
+          <li>Fast breathing or heartbeat, strong thirst, irritability</li>
+        </ul>
+        <p>Move them somewhere cool, remove extra layers, give water or a rehydration drink, and cool their skin. They should feel better within 30 minutes.</p>
+        <p class="callout"><strong>Call 999</strong> if they're not better after 30 minutes, or if their skin is hot and dry and not sweating, they're confused or uncoordinated, very short of breath, have a fit or lose consciousness. That can be heatstroke.</p>
+      </div>
+    </details>
+    <details id="t-rain">
+      <summary><h3>Rain</h3><span class="plus">+</span></summary>
+      <div class="g-body">
+        <p class="g-lead">There's no bad weather, only wet people without a plan.</p>
+        <ul>
+          <li><strong>Proper waterproofs,</strong> top and bottom. Spares for anyone who turns up in a cotton hoodie.</li>
+          <li><strong>A tarp</strong> turns a wet session into a cosy one. Pitch it before you need it.</li>
+          <li><strong>Watch your footing.</strong> Roots, boards, rocks and slopes get slick.</li>
+          <li><strong>Rain plus cold</strong> is when people chill quickest. Shorten the sit and keep moving.</li>
+          <li><strong>Rain can be the session.</strong> The sound on the leaves, the smell of the earth. Weather is a fine co-facilitator.</li>
+        </ul>
+      </div>
+    </details>
+    <details id="t-snow">
+      <summary><h3>Snow and ice</h3><span class="plus">+</span></summary>
+      <div class="g-body">
+        <p class="g-lead">Beautiful and quiet. Also slippy, and heavy on branches.</p>
+        <ul>
+          <li><strong>Falls are the main risk.</strong> Good grip on boots. Take paths slowly. Avoid steep slopes.</li>
+          <li><strong>Heavy snow weighs down branches</strong> and can snap them. Keep clear of loaded trees, especially in wind.</li>
+          <li><strong>Freezing rain</strong> coats everything in ice. That's a day for a short, flat walk or staying in.</li>
+          <li><strong>Frozen water is never safe</strong> to walk on, however solid it looks.</li>
+          <li><strong>Getting there</strong> is often harder than being there. Allow time and check the roads.</li>
+        </ul>
+      </div>
+    </details>
+    <details id="t-fog">
+      <summary><h3>Fog</h3><span class="plus">+</span></summary>
+      <div class="g-body">
+        <p class="g-lead">Fog makes small woods feel big. Stay on paths you know.</p>
+        <ul>
+          <li><strong>Stick to familiar routes.</strong> Landmarks disappear quickly.</li>
+          <li><strong>Keep groups close</strong> and count heads more often.</li>
+          <li><strong>Take care near roads and water,</strong> where you can't see what's coming.</li>
+          <li><strong>Bring a light,</strong> even in daytime, and a charged phone.</li>
+        </ul>
+      </div>
+    </details>
+    <details id="t-flood">
+      <summary><h3>Flooding</h3><span class="plus">+</span></summary>
+      <div class="g-body">
+        <p class="g-lead">Water rises faster than you think, and hides what's underneath.</p>
+        <ul>
+          <li><strong>Never walk through flood water.</strong> 15cm of fast-flowing water can knock an adult off their feet.</li>
+          <li><strong>Hidden dangers</strong> sit under the surface: debris, holes, drains.</li>
+          <li><strong>Riverside spots</strong> can flood after heavy rain upstream, even on a dry day.</li>
+          <li><strong>Check flood warnings</strong> before you go. Links are on the Forecast tab.</li>
+        </ul>
+      </div>
+    </details>
+    <details id="t-dark">
+      <summary><h3>Dusk and dark</h3><span class="plus">+</span></summary>
+      <div class="g-body">
+        <p class="g-lead">The light goes faster under trees.</p>
+        <ul>
+          <li><strong>Know your sunset time.</strong> It's shown on the Forecast tab.</li>
+          <li><strong>Head torch for everyone</strong> if you'll be out near dusk.</li>
+          <li><strong>Choose a spot you know well</strong> for dusk sits, with an easy route out.</li>
+          <li><strong>It gets colder</strong> as the sun drops. Add a layer before you need it.</li>
+        </ul>
+      </div>
+    </details>
+    <details id="t-notice" open>
+      <summary><h3>Who might not notice</h3><span class="plus">+</span></summary>
+      <div class="g-body">
+        <p class="g-lead">Some people don't feel the cold until it's a problem. Don't wait for them to say.</p>
+        <p>Some people don't notice, or don't say, when they're getting cold, hot, hungry or thirsty. This is often linked to <em>interoception</em>, the sense of what's happening inside the body. Differences in interoception are common in autistic people and some other neurodivergent people.</p>
+        <p>It can also happen to anyone who is:</p>
+        <ul>
+          <li>Dissociating, overwhelmed or in a trauma response. This matters a lot in therapy sessions.</li>
+          <li>Deeply absorbed in what they're doing</li>
+          <li>Older, as the body's warning signals often get quieter with age</li>
+          <li>Unwell, very tired, or taking some medications</li>
+        </ul>
+        <p class="g-sub">Watch for signs you can see</p>
+        <ul>
+          <li><strong>Cold:</strong> shivering, pale or blue-tinged lips, cold hands, fumbling fingers, stiff or slow movement, going quiet or withdrawn, slurred speech.</li>
+          <li><strong>Hot:</strong> flushed or very pale face, heavy sweating, irritability, sluggishness, rubbing their head.</li>
+        </ul>
+        <p class="g-sub">Check in in ways that work</p>
+        <ul>
+          <li><strong>Ask concrete questions.</strong> "Are your hands warm or cold?" works better than "Are you OK?"</li>
+          <li><strong>Use something to compare.</strong> "Touch your hands to your cheeks. Which is colder?"</li>
+          <li><strong>Try a quick scale.</strong> "From 1 to 5, how warm are you?" or thumbs up, middle, down.</li>
+          <li><strong>Build check-ins into the rhythm</strong> of the session, rather than relying on people to speak up.</li>
+        </ul>
+        <p class="g-sub">Make it automatic</p>
+        <ul>
+          <li><strong>Layers go on at set points,</strong> like when you stop to sit. Then nobody has to decide or ask.</li>
+          <li><strong>Drink and snack breaks</strong> on a timer, not on thirst.</li>
+          <li><strong>Carry a spare kit bag</strong> with hats, gloves, a layer and a foil blanket.</li>
+          <li><strong>Ask beforehand</strong> what helps. "What does getting cold look like for you?" People often know themselves best.</li>
+          <li><strong>Use a buddy system</strong> in groups. Agree a simple signal for "I need a break".</li>
+        </ul>
+      </div>
+    </details>
+    <details id="t-sources">
+      <summary><h3>Sources</h3><span class="plus">+</span></summary>
+      <div class="g-body">
+        <ul>
+          <li><a href="https://weather.metoffice.gov.uk/warnings-and-advice/seasonal-advice/stay-safe-in-lightning" target="_blank" rel="noopener">Met Office: staying safe in lightning</a></li>
+          <li><a href="https://www.canada.ca/en/environment-climate-change/services/lightning/safety/before-and-after-a-storm.html" target="_blank" rel="noopener">Environment and Climate Change Canada: the 30-minute rule</a></li>
+          <li><a href="https://nationaltrust.org.uk/visit/norfolk/oxburgh-estate/high-wind-policy" target="_blank" rel="noopener">National Trust: an example high wind policy</a></li>
+          <li><a href="https://www.forestryengland.uk/news/public-asked-stay-away-storm-hit-forests" target="_blank" rel="noopener">Forestry England: staying away from storm-hit forests</a></li>
+          <li><a href="https://www.nidirect.gov.uk/conditions/hypothermia" target="_blank" rel="noopener">nidirect (NHS information): hypothermia</a></li>
+          <li><a href="https://111.wales.nhs.uk/Heatexhaustionandheatstroke" target="_blank" rel="noopener">NHS 111 Wales: heat exhaustion and heatstroke</a></li>
+          <li><a href="https://ukhsa.blog.gov.uk/2026/01/08/what-is-the-difference-between-weather-health-alerts-and-severe-weather-warnings/" target="_blank" rel="noopener">UKHSA: weather-health alerts explained</a></li>
+          <li><a href="https://abuhb.nhs.wales/files/childrens-ot/interoception-system-pdf/" target="_blank" rel="noopener">Aneurin Bevan NHS: understanding interoception</a></li>
+          <li><a href="https://rossendale.gov.uk/downloads/file/13916/flash-flooding-advice" target="_blank" rel="noopener">Flash flooding advice (15cm of flowing water)</a></li>
+        </ul>
+        <p>rewildingtherapies.com</p>
+      </div>
+    </details>
+  </div>
+</template>
+
+<script>
+const LOC_KEY = "top-weatherwise-place";
+const CHECK_KEY = "top-weatherwise-check";
+const WMO = {
+  0: "Clear sky", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast", 45: "Fog", 48: "Freezing fog",
+  51: "Light drizzle", 53: "Drizzle", 55: "Heavy drizzle", 56: "Freezing drizzle", 57: "Heavy freezing drizzle",
+  61: "Light rain", 63: "Rain", 65: "Heavy rain", 66: "Freezing rain", 67: "Heavy freezing rain",
+  71: "Light snow", 73: "Snow", 75: "Heavy snow", 77: "Snow grains", 80: "Light showers", 81: "Showers", 82: "Violent showers",
+  85: "Snow showers", 86: "Heavy snow showers", 95: "Thunderstorm", 96: "Thunderstorm with hail", 99: "Thunderstorm with heavy hail",
+};
+const THUNDER = [95, 96, 99], FREEZE = [56, 57, 66, 67], SNOW = [71, 73, 75, 77, 85, 86], HEAVY_SNOW = [75, 86], HEAVY_RAIN = [65, 82];
+
+const state = { view: "forecast", place: null, data: null, loading: false, error: "", results: [], searchMsg: "", day: null, start: null, hours: 2, manual: new Set() };
+
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const pad = (n) => String(n).padStart(2, "0");
+const store = { get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+
+/* ---------- Data ---------- */
+async function searchPlaces(q) {
+  state.searchMsg = "Searching…"; state.results = []; render();
+  try {
+    const r = await fetch("https://geocoding-api.open-meteo.com/v1/search?count=6&language=en&format=json&name=" + encodeURIComponent(q));
+    const j = await r.json();
+    state.results = (j.results || []).map(x => ({ name: x.name, lat: x.latitude, lon: x.longitude, area: [x.admin1, x.country].filter(Boolean).join(", ") }));
+    state.searchMsg = state.results.length ? "" : "No places found. Try a town, village or postcode district.";
+  } catch (e) { state.searchMsg = "Couldn't search just now. Check your connection and try again."; }
+  render();
+}
+function useMyLocation() {
+  if (!navigator.geolocation) { state.searchMsg = "This browser can't share a location. Search for a place instead."; render(); return; }
+  state.searchMsg = "Finding you…"; render();
+  navigator.geolocation.getCurrentPosition(p => {
+    setPlace({ name: "My location", lat: +p.coords.latitude.toFixed(3), lon: +p.coords.longitude.toFixed(3), area: "" });
+  }, err => {
+    state.searchMsg = err && err.code === 1 ? "Location wasn't allowed. Search for a place instead." : "Couldn't find your location. Search for a place instead.";
+    render();
+  }, { timeout: 15000 });
+}
+function setPlace(p) { state.place = p; state.results = []; state.searchMsg = ""; store.set(LOC_KEY, p); loadForecast(); }
+
+async function loadForecast() {
+  if (!state.place) return;
+  state.loading = true; state.error = ""; render();
+  const url = "https://api.open-meteo.com/v1/forecast?latitude=" + state.place.lat + "&longitude=" + state.place.lon +
+    "&hourly=temperature_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,visibility,uv_index,is_day" +
+    "&daily=sunrise,sunset&wind_speed_unit=mph&timezone=auto&forecast_days=7";
+  try {
+    const r = await fetch(url); if (!r.ok) throw new Error("bad");
+    const j = await r.json();
+    state.data = j;
+    const days = dayList();
+    if (!state.day || !days.includes(state.day)) state.day = days[0];
+    if (state.start === null) { const now = new Date(); state.start = Math.min(22, now.getHours() + (now.getMinutes() > 0 ? 1 : 0)); }
+  } catch (e) { state.error = "Couldn't load the forecast just now. Try again in a moment, or tap the conditions yourself below."; state.data = null; }
+  state.loading = false; render();
+}
+function dayList() { return state.data ? state.data.daily.time : []; }
+
+function windowRows() {
+  const h = state.data.hourly, out = [];
+  for (let i = 0; i < h.time.length; i++) {
+    const [d, t] = h.time[i].split("T"); const hr = +t.slice(0, 2);
+    if (d === state.day && hr >= state.start && hr < state.start + state.hours) {
+      out.push({ time: t.slice(0, 5), temp: h.temperature_2m[i], feels: h.apparent_temperature[i], pop: h.precipitation_probability[i], rain: h.precipitation[i],
+        code: h.weather_code[i], wind: h.wind_speed_10m[i], gust: h.wind_gusts_10m[i], vis: h.visibility[i], uv: h.uv_index[i], day: h.is_day[i] });
+    }
+  }
+  return out;
+}
+
+/* ---------- Rules ---------- */
+function assess(rows) {
+  const R = [];
+  const max = (k) => Math.max(...rows.map(r => r[k] ?? -Infinity));
+  const min = (k) => Math.min(...rows.map(r => r[k] ?? Infinity));
+  const codes = new Set(rows.map(r => r.code));
+  const gust = max("gust"), cold = min("feels"), hot = max("feels"), uv = max("uv"), vis = min("vis"), rain = max("rain"), pop = max("pop");
+  const has = (list) => list.some(c => codes.has(c));
+  if (has(THUNDER)) R.push({ l: 2, t: "thunder", s: "Thunderstorms forecast. Lightning risk under trees and in the open." });
+  if (gust >= 39) R.push({ l: 2, t: "wind", s: `Gusts up to ${Math.round(gust)} mph. Branches can break. Not in the woods.` });
+  else if (gust >= 32) R.push({ l: 1, t: "wind", s: `Gusts up to ${Math.round(gust)} mph. Whole trees moving. Keep clear of big old trees and dead wood.` });
+  if (cold <= -10) R.push({ l: 2, t: "cold", s: `Feels like ${Math.round(cold)}°C. Too cold for a safe sit.` });
+  else if (cold <= -5) R.push({ l: 1, t: "cold", s: `Feels like ${Math.round(cold)}°C. Very cold. Short sits, lots of movement, and check on everyone often.` });
+  else if (cold <= 0) R.push({ l: 1, t: "cold", s: `Feels like ${Math.round(cold)}°C. Freezing. Layers on before you sit, and insulate from the ground.` });
+  if (hot >= 32) R.push({ l: 2, t: "heat", s: `Feels like ${Math.round(hot)}°C. Too hot for a full session. Go very early or late, or rearrange.` });
+  else if (hot >= 30) R.push({ l: 1, t: "heat", s: `Feels like ${Math.round(hot)}°C. Very warm. Deep shade, plenty of water, gentle pace.` });
+  else if (hot >= 25) R.push({ l: 1, t: "heat", s: `Feels like ${Math.round(hot)}°C. Warm. Shade and water.` });
+  if (uv >= 6) R.push({ l: 1, t: "heat", s: `UV index up to ${Math.round(uv)}. High. Hat, sun cream and shade.` });
+  if (has(FREEZE)) R.push({ l: 1, t: "snow", s: "Freezing rain or drizzle. Paths and steps may turn icy." });
+  if (has(HEAVY_SNOW)) R.push({ l: 1, t: "snow", s: "Heavy snow. Slips, and branches under heavy load." });
+  else if (has(SNOW)) R.push({ l: 1, t: "snow", s: "Snow forecast. Watch your footing." });
+  if (has(HEAVY_RAIN) || rain >= 4) R.push({ l: 1, t: "rain", s: "Heavy rain at times. Waterproofs, a tarp, and care near rivers and slopes." });
+  else if (pop >= 60 && rain > 0.2) R.push({ l: 0, t: "rain", s: `Rain likely (${pop}% chance). Pack waterproofs.` });
+  if (vis < 1000) R.push({ l: 1, t: "fog", s: `Fog, visibility down to about ${Math.round(vis)} m. Stick to paths you know.` });
+  if (rows.some(r => r.day === 0)) R.push({ l: 1, t: "dark", s: "Part of this time is after dark. Head torches, and a spot you know well." });
+  return R;
+}
+function manualAssess() {
+  const M = state.manual, R = [];
+  if (M.has("thunder")) R.push({ l: 2, t: "thunder", s: "Thunder forecast. Lightning risk under trees and in the open." });
+  if (M.has("gale")) R.push({ l: 2, t: "wind", s: "Gale-force gusts (39 mph or more). Not in the woods." });
+  else if (M.has("windy")) R.push({ l: 1, t: "wind", s: "Strong gusts (32 to 38 mph). Keep clear of big old trees and dead wood." });
+  if (M.has("freezing")) R.push({ l: 1, t: "cold", s: "Freezing. Layers on before you sit. Short sits, lots of movement." });
+  if (M.has("hot")) R.push({ l: 1, t: "heat", s: "Hot. Go early or late, shade and plenty of water." });
+  if (M.has("rain")) R.push({ l: 1, t: "rain", s: "Heavy rain. Waterproofs, a tarp, and care on slopes and near rivers." });
+  if (M.has("snow")) R.push({ l: 1, t: "snow", s: "Snow or ice. Slips, and loaded branches." });
+  if (M.has("fog")) R.push({ l: 1, t: "fog", s: "Fog. Stick to paths you know." });
+  if (M.has("flood")) R.push({ l: 2, t: "flood", s: "Flood warning. Stay away from rivers and never cross flood water." });
+  if (M.has("storm")) R.push({ l: 2, t: "wind", s: "Storm in the last few days. Stay out until the woods have been checked for hung-up trees." });
+  return R;
+}
+function verdictHTML(R, sub) {
+  const top = R.reduce((m, r) => Math.max(m, r.l), 0);
+  const cls = ["go", "care", "stop"][top];
+  const title = ["Good to go", "Go with care", "Not today"][top];
+  const blurb = ["Nothing in the forecast to worry about. Still pack for a change.", "Fine to go, with a few things to plan for.", "Rearrange, or choose somewhere open and sheltered away from trees."][top];
+  const items = (R.length ? R : [{ l: 0, t: "", s: "No warnings for this time." }]).sort((a, b) => b.l - a.l);
+  return `<section class="verdict ${cls}" aria-label="Verdict">
+    <div class="v-top"><span class="v-dot"></span><div><div class="v-title">${title}</div><div class="v-sub">${esc(sub)}</div></div></div>
+    <p>${blurb}</p>
+    <ul class="reasons">${items.map(r => `<li class="l${r.l}"><i></i><span>${esc(r.s)} ${r.t ? `<a href="#t-${r.t}" data-jump="t-${r.t}">Tips</a>` : ""}</span></li>`).join("")}</ul>
+  </section>`;
+}
+
+/* ---------- Views ---------- */
+function render() {
+  const v = $("#view");
+  if (state.view === "forecast") v.innerHTML = forecastHTML();
+  else if (state.view === "tips") { v.innerHTML = ""; v.appendChild($("#tips-tpl").content.cloneNode(true)); }
+  else v.innerHTML = readyHTML();
+  if (state.view === "ready") bindReady();
+}
+
+function placePanel() {
+  const res = state.results.length ? `<div class="results">${state.results.map((r, i) => `<button data-pick="${i}"><b>${esc(r.name)}</b> <small>${esc(r.area)}</small></button>`).join("")}</div>` : "";
+  return `<div class="panel">
+    ${state.place ? `<div class="row spread"><div><span class="label">Forecast for</span><div class="place">${esc(state.place.name)}${state.place.area ? ` <small class="toast">${esc(state.place.area)}</small>` : ""}</div></div>
+      <button class="btn small" id="change">Change place</button></div>` : ""}
+    <div class="panel" id="finder" ${state.place && !state.changing ? "hidden" : ""}>
+      <form class="search" id="search-form"><input id="q" type="search" placeholder="Search a town, park or postcode" autocomplete="off" aria-label="Search for a place"><button class="btn primary" type="submit">Search</button></form>
+      <div class="row"><button class="btn small" id="geo">Use my location</button><span class="toast">Stays on this device.</span></div>
+      ${state.searchMsg ? `<p class="toast">${esc(state.searchMsg)}</p>` : ""}
+      ${res}
+    </div>
+  </div>`;
+}
+
+function whenPanel() {
+  const days = dayList();
+  const dayLabel = (d, i) => i === 0 ? "Today" : i === 1 ? "Tomorrow" : new Date(d + "T12:00:00").toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "short" });
+  return `<div class="when">
+    <div class="field"><label class="label" for="day">Day</label><select id="day">${days.map((d, i) => `<option value="${d}" ${d === state.day ? "selected" : ""}>${dayLabel(d, i)}</option>`).join("")}</select></div>
+    <div class="field"><label class="label" for="start">Start</label><select id="start">${Array.from({ length: 19 }, (_, i) => i + 5).map(h => `<option value="${h}" ${h === state.start ? "selected" : ""}>${pad(h)}:00</option>`).join("")}</select></div>
+    <div class="field"><label class="label" for="hours">For</label><select id="hours">${[1, 2, 3, 4, 6].map(h => `<option value="${h}" ${h === state.hours ? "selected" : ""}>${h} ${h === 1 ? "hour" : "hours"}</option>`).join("")}</select></div>
+  </div>`;
+}
+
+function forecastHTML() {
+  let body = "";
+  if (!state.place) {
+    body = `<div class="sheet"><p>Find your spot to get a clear call for when you're heading out, with the reasons why and tips to match.</p></div>`;
+  } else if (state.loading) {
+    body = `<p class="toast">Loading the forecast…</p>`;
+  } else if (state.data) {
+    const rows = windowRows();
+    if (!rows.length) body = whenPanel() + `<p class="toast">No forecast for that time. Pick a time later than now.</p>`;
+    else {
+      const R = assess(rows);
+      const di = dayList().indexOf(state.day);
+      const sunset = state.data.daily.sunset[di] ? state.data.daily.sunset[di].slice(11, 16) : "";
+      const sunrise = state.data.daily.sunrise[di] ? state.data.daily.sunrise[di].slice(11, 16) : "";
+      const end = state.start + state.hours;
+      const sub = `${new Date(state.day + "T12:00:00").toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}, ${pad(state.start)}:00 to ${pad(end % 24)}:00`;
+      const f = (k, fn) => fn(...rows.map(r => r[k]));
+      const sky = [...new Set(rows.map(r => WMO[r.code] || ""))].filter(Boolean).slice(0, 3).join(", ");
+      body = whenPanel() + verdictHTML(R, sub) + `
+        <div class="facts">
+          <div class="fact"><b>${Math.round(f("feels", Math.min))}° to ${Math.round(f("feels", Math.max))}°</b><span>Feels like</span></div>
+          <div class="fact"><b>${Math.round(f("gust", Math.max))} mph</b><span>Strongest gust</span></div>
+          <div class="fact"><b>${f("pop", Math.max)}%</b><span>Chance of rain</span></div>
+          <div class="fact"><b>${Math.round(f("uv", Math.max))}</b><span>UV index</span></div>
+          <div class="fact"><b>${sunrise}</b><span>Sunrise</span></div>
+          <div class="fact"><b>${sunset}</b><span>Sunset</span></div>
+        </div>
+        <p class="toast">${esc(sky)}</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Time</th><th>Sky</th><th>Feels</th><th>Gusts</th><th>Rain</th><th>UV</th></tr></thead>
+          <tbody>${rows.map(r => `<tr>
+            <td>${r.time}</td><td class="${THUNDER.includes(r.code) ? "l2" : ""}">${esc(WMO[r.code] || "")}</td>
+            <td class="${r.feels <= -10 || r.feels >= 32 ? "l2" : r.feels <= 0 || r.feels >= 25 ? "l1" : ""}">${Math.round(r.feels)}°</td>
+            <td class="${r.gust >= 39 ? "l2" : r.gust >= 32 ? "l1" : ""}">${Math.round(r.gust)} mph</td>
+            <td>${r.pop}%${r.rain > 0 ? ` · ${r.rain.toFixed(1)} mm` : ""}</td>
+            <td class="${r.uv >= 6 ? "l1" : ""}">${Math.round(r.uv)}</td></tr>`).join("")}</tbody>
+        </table></div>`;
+    }
+  } else if (state.error) {
+    body = `<p class="toast err">${esc(state.error)}</p>`;
+  }
+  const manual = `<details ${state.data ? "" : "open"} class="manual"><summary><h3>Or tap what's coming</h3><span class="plus">+</span></summary>
+    <div class="g-body">
+      <p class="toast">Use this if the forecast won't load, or to add things the forecast doesn't show, like flood warnings or a recent storm.</p>
+      <div class="chips">${[["windy", "Strong gusts"], ["gale", "Gale (39 mph+)"], ["thunder", "Thunder"], ["freezing", "Freezing"], ["hot", "Hot"], ["rain", "Heavy rain"], ["snow", "Snow or ice"], ["fog", "Fog"], ["flood", "Flood warning"], ["storm", "Storm in the last few days"]]
+        .map(([k, l]) => `<button class="chip" data-manual="${k}" aria-pressed="${state.manual.has(k)}">${l}</button>`).join("")}</div>
+      ${state.manual.size ? verdictHTML(manualAssess(), "Based on what you tapped") : ""}
+    </div></details>`;
+  return `<div class="sheet">${placePanel()}${body}${manual}
+    <div class="also"><span class="label">Also check before you go</span>
+      <ul>
+        <li><a href="https://weather.metoffice.gov.uk/warnings-and-advice/uk-warnings" target="_blank" rel="noopener">Met Office weather warnings</a></li>
+        <li>Flood warnings: <a href="https://check-for-flooding.service.gov.uk/" target="_blank" rel="noopener">England</a> · <a href="https://flood-warning.naturalresources.wales/" target="_blank" rel="noopener">Wales</a> · <a href="https://floodline.sepa.org.uk/floodupdates/" target="_blank" rel="noopener">Scotland</a> · <a href="https://www.nidirect.gov.uk/articles/check-the-risk-of-flooding-in-your-area" target="_blank" rel="noopener">Northern Ireland</a></li>
+        <li><a href="https://ukhsa-dashboard.data.gov.uk/weather-health-alerts" target="_blank" rel="noopener">UKHSA heat and cold health alerts</a> (England)</li>
+        <li>Your site's own notices. Many woods close in high winds.</li>
+      </ul>
+    </div></div>`;
+}
+
+const CHECKS = [
+  ["Checked the forecast and any warnings", "Weather, flood warnings, and site closures."],
+  ["Told someone where I'm going and when I'll be back", ""],
+  ["Phone charged", "Plus a small power bank on longer days."],
+  ["Layers for the weather", "Warm layers, waterproof, hat and gloves. Or sun hat and light sleeves."],
+  ["Something to sit on", "A sit mat keeps the cold ground away."],
+  ["Water and a snack", "A warm drink in a flask on cold days."],
+  ["Head torch", "If you'll be out anywhere near dusk."],
+  ["Small first aid kit and a foil blanket", ""],
+  ["Know my way out", "And the nearest shelter, building or car."],
+  ["Leading a group: spare kit bag", "Hats, gloves, a spare layer, waterproofs."],
+  ["Leading a group: contacts and needs", "Emergency contacts, medical info, and what helps each person."],
+  ["Leading a group: check-in rhythm agreed", "Set points for layers, drinks and a quick \"how warm are you, 1 to 5?\""],
+];
+function readyHTML() {
+  const done = store.get(CHECK_KEY) || [];
+  const reason = currentReasonText();
+  const day = state.day ? new Date(state.day + "T12:00:00").toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }) : "[day]";
+  const msg = `Hi all,\n\nThe forecast for ${day} shows ${reason}. To keep everyone safe, I'm [moving / cancelling] our session at [place].\n\n[New date, time or plan.]\n\nThanks for understanding. The woods will still be there.\n\n[Your name]`;
+  return `<div class="sheet">
+    <div class="row spread"><h2>Before you go</h2><button class="btn small" id="reset-check">Clear ticks</button></div>
+    <div class="check">${CHECKS.map(([t, s], i) => `<label><input type="checkbox" id="c${i}" data-i="${i}" ${done.includes(i) ? "checked" : ""}><span>${esc(t)}${s ? `<small>${esc(s)}</small>` : ""}</span></label>`).join("")}</div>
+    <div class="panel">
+      <h3>If you need to cancel</h3>
+      <p class="toast">A message you can copy and send. Edit the bits in brackets.</p>
+      <textarea class="msg" id="msg" aria-label="Cancellation message">${esc(msg)}</textarea>
+      <div class="row"><button class="btn primary" id="copy">Copy message</button><span class="toast" id="copied"></span></div>
+    </div>
+  </div>`;
+}
+function currentReasonText() {
+  let R = [];
+  if (state.data) { const rows = windowRows(); if (rows.length) R = assess(rows); }
+  R = R.concat(manualAssess()).filter(r => r.l >= 1);
+  const words = { thunder: "thunderstorms", wind: "strong winds", cold: "very cold conditions", heat: "very hot conditions", snow: "snow and ice", rain: "heavy rain", fog: "thick fog", flood: "a flood warning", dark: "an early dark" };
+  const list = [...new Set(R.sort((a, b) => b.l - a.l).map(r => words[r.t]).filter(Boolean))];
+  if (!list.length) return "[the weather]";
+  return list.length === 1 ? list[0] : list.slice(0, -1).join(", ") + " and " + list[list.length - 1];
+}
+function bindReady() {
+  $("#view").querySelectorAll(".check input").forEach(el => el.addEventListener("change", () => {
+    const set = new Set(store.get(CHECK_KEY) || []); el.checked ? set.add(+el.dataset.i) : set.delete(+el.dataset.i); store.set(CHECK_KEY, [...set]);
+  }));
+  $("#reset-check").onclick = () => { store.set(CHECK_KEY, []); render(); };
+  $("#copy").onclick = async () => {
+    const ta = $("#msg");
+    try { await navigator.clipboard.writeText(ta.value); $("#copied").textContent = "Copied."; }
+    catch (e) { ta.focus(); ta.select(); $("#copied").textContent = "Selected. Press copy on your keyboard or phone."; }
+  };
+}
+
+/* ---------- Events ---------- */
+function go(view, jump) {
+  state.view = view;
+  document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", String(t.dataset.view === view)));
+  render();
+  if (jump) { const d = document.getElementById(jump); if (d) { d.open = true; d.scrollIntoView({ behavior: "smooth", block: "start" }); } }
+  else window.scrollTo({ top: 0 });
+}
+document.addEventListener("click", e => {
+  const tab = e.target.closest(".tab"); if (tab) { go(tab.dataset.view); return; }
+  const j = e.target.closest("[data-jump]"); if (j) { e.preventDefault(); go("tips", j.dataset.jump); return; }
+  const pick = e.target.closest("[data-pick]"); if (pick) { setPlace(state.results[+pick.dataset.pick]); state.changing = false; return; }
+  if (e.target.closest("#geo")) { state.changing = false; useMyLocation(); return; }
+  if (e.target.closest("#change")) { state.changing = true; render(); const q = $("#q"); if (q) q.focus(); return; }
+  const m = e.target.closest("[data-manual]"); if (m) {
+    const k = m.dataset.manual; state.manual.has(k) ? state.manual.delete(k) : state.manual.add(k);
+    if (k === "gale" && state.manual.has("gale")) state.manual.delete("windy");
+    if (k === "windy" && state.manual.has("windy")) state.manual.delete("gale");
+    render(); const d = document.querySelector("details.manual"); if (d) d.open = true; return;
+  }
+});
+document.addEventListener("submit", e => {
+  if (e.target.id === "search-form") { e.preventDefault(); const q = $("#q").value.trim(); if (q.length >= 2) searchPlaces(q); }
+});
+document.addEventListener("change", e => {
+  if (e.target.id === "day") { state.day = e.target.value; render(); }
+  if (e.target.id === "start") { state.start = +e.target.value; render(); }
+  if (e.target.id === "hours") { state.hours = +e.target.value; render(); }
+});
+
+const saved = store.get(LOC_KEY);
+if (saved && typeof saved.lat === "number") { state.place = saved; loadForecast(); } else render();
+</script>
+</body>
+</html>
