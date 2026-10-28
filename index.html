@@ -174,6 +174,43 @@ textarea.msg { width: 100%; min-height: 150px; border: 1px solid var(--line); bo
   .v-title { font-size: 1.7rem; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* Course */
+.course { display: flex; flex-direction: column; gap: 18px; }
+.c-head { display: flex; flex-direction: column; gap: 10px; }
+.c-prog { height: 6px; border-radius: 3px; background: var(--moss-soft); overflow: hidden; }
+.c-prog span { display: block; height: 100%; background: var(--moss); border-radius: 3px; }
+.lessons { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.lesson-row { width: 100%; display: grid; grid-template-columns: 34px 1fr auto; gap: 12px; align-items: center; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); padding: 13px 2px; cursor: pointer; }
+.lesson-row:hover { background: var(--moss-soft); }
+.l-num { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--moss); color: var(--moss); display: grid; place-items: center; font-size: 0.82rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.l-num.done { background: var(--moss); color: var(--bg); }
+.l-main { min-width: 0; display: flex; flex-direction: column; }
+.l-title { font-family: var(--display); font-size: 1.2rem; font-weight: 600; color: var(--forest); line-height: 1.2; }
+.l-sub { font-size: 0.8rem; color: var(--muted); }
+.l-meta { font-size: 0.75rem; color: var(--muted); white-space: nowrap; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.c-lesson h2 { font-size: 1.6rem; }
+.c-lead { font-family: var(--display); font-style: italic; color: var(--ember); font-size: 1.1rem; }
+.c-card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px 22px 24px; display: flex; flex-direction: column; gap: 12px; min-height: 300px; animation: cardIn .25s ease-out; }
+@keyframes cardIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.c-count { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; color: var(--ember); }
+.c-card h3 { font-size: 1.55rem; }
+.c-body { display: flex; flex-direction: column; gap: 10px; font-size: 1rem; line-height: 1.65; max-width: 60ch; }
+.c-body p { margin: 0; }
+.c-body ul { margin: 0; padding-left: 1.1em; display: flex; flex-direction: column; gap: 9px; }
+.c-body li::marker { color: var(--ember); }
+.c-body strong { color: var(--forest); font-weight: 600; }
+.c-try { margin-top: auto; border-left: 3px solid var(--moss); background: var(--moss-soft); border-radius: 0 10px 10px 0; padding: 10px 14px; display: flex; flex-direction: column; gap: 2px; }
+.c-try span { font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; color: var(--moss); }
+.c-try p { margin: 0; font-size: 0.93rem; }
+.c-dots { display: flex; gap: 6px; justify-content: center; }
+.c-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--line); }
+.c-dots i.past { background: var(--moss); opacity: 0.5; }
+.c-dots i.on { background: var(--ember); width: 18px; border-radius: 4px; }
+.btn:disabled { opacity: 0.45; cursor: default; }
+@media (prefers-reduced-motion: reduce) { .c-card { animation: none; } }
+@media (max-width: 520px) { .lesson-row { grid-template-columns: 34px 1fr; } .l-meta { display: none; } .c-card { padding: 18px 16px 20px; min-height: 340px; } }
 </style>
 </head>
 <body>
@@ -207,202 +244,6 @@ textarea.msg { width: 100%; min-height: 150px; border: 1px solid var(--line); bo
     <span>Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0). Place search uses GeoNames.</span>
   </footer>
 </div>
-
-<template id="tips-tpl">
-  <div class="guide">
-    <details id="t-wind">
-      <summary><h3>Wind</h3><span class="plus">+</span></summary>
-      <div class="g-body">
-        <p class="g-lead">Trees are the main risk. Look up as well as ahead.</p>
-        <p class="g-sub">How strong is strong?</p>
-        <ul>
-          <li><strong>Under 32 mph gusts.</strong> Fine for most woods. Watch for dead branches that have already come down.</li>
-          <li><strong>32 to 38 mph (near gale).</strong> Whole trees sway. Go with care: keep away from big old trees, dead wood and leaning trunks. Choose a clearing or woodland edge.</li>
-          <li><strong>39 mph and over (gale).</strong> Twigs and branches start to break. Not in the woods. Many sites close from 40 mph, and fully from around 45.</li>
-        </ul>
-        <p class="g-sub">Tips</p>
-        <ul>
-          <li>Gusts matter more than the average speed. Check the gust figure.</li>
-          <li>Conifers and trees in full leaf catch more wind. Wet ground loosens roots.</li>
-          <li>Keep shelters low and well tied. A tarp in a gust becomes a sail.</li>
-          <li>Wind makes it feel much colder. Check the "feels like" temperature too.</li>
-          <li>Fires and wind don't mix. Keep fires small, or skip them.</li>
-        </ul>
-        <p class="callout"><strong>After a storm,</strong> stay out until the woods have been checked. Trees blown over but caught in others, called hung-up trees, can fall with little or no warning. Loose limbs can drop days later.</p>
-      </div>
-    </details>
-    <details id="t-thunder">
-      <summary><h3>Thunder and lightning</h3><span class="plus">+</span></summary>
-      <div class="g-body">
-        <p class="g-lead">If you can hear thunder, lightning is close enough to reach you.</p>
-        <ul>
-          <li><strong>Forecast thunder?</strong> Move the session or go somewhere with proper shelter nearby.</li>
-          <li><strong>Hear thunder?</strong> Head for a building or a car with a hard roof straight away.</li>
-          <li><strong>Don't shelter under trees,</strong> lone ones especially. Stay away from tall objects and anything that conducts electricity.</li>
-          <li><strong>Get off high ground</strong> and away from open water.</li>
-          <li><strong>Caught in the open?</strong> Crouch low with your head tucked, keeping as little of you touching the ground as you can.</li>
-          <li><strong>Wait 30 minutes</strong> after the last rumble before going back out.</li>
-        </ul>
-      </div>
-    </details>
-    <details id="t-cold">
-      <summary><h3>Cold</h3><span class="plus">+</span></summary>
-      <div class="g-body">
-        <p class="g-lead">Sitting still is where people get cold. Plan for it before anyone feels it.</p>
-        <ul>
-          <li><strong>Layers on before you sit,</strong> not when you're already cold. Hat, gloves, a warm mid layer and something windproof.</li>
-          <li><strong>Insulate from the ground.</strong> A sit mat makes a big difference.</li>
-          <li><strong>Keep it moving.</strong> Shorter sits, with walking or movement in between.</li>
-          <li><strong>Warm drinks and snacks.</strong> Food is fuel for staying warm.</li>
-          <li><strong>Wet plus wind is the danger mix.</strong> Damp clothes lose their warmth fast.</li>
-          <li><strong>Carry spares.</strong> Hats, gloves and a spare layer for anyone who comes underdressed.</li>
-        </ul>
-        <p class="g-sub">Signs someone is getting too cold</p>
-        <ul>
-          <li>Shivering, cold and pale skin, tiredness</li>
-          <li>Slurred speech, fast breathing, confusion</li>
-          <li>Fumbling hands, clumsiness, going quiet</li>
-        </ul>
-        <p class="callout"><strong>If someone stops shivering</strong> but is still cold, gets confused or drowsy, it's getting serious. Call 999. Get them out of the wind, off the cold ground, into dry layers, and give a warm non-alcoholic drink and something sugary if they can swallow normally. Don't rub their limbs or use direct heat.</p>
-        <p>For the people who don't notice they're cold, see <a href="#t-notice" data-jump="t-notice">Neurodivergent awareness</a>.</p>
-      </div>
-    </details>
-    <details id="t-heat">
-      <summary><h3>Heat and sun</h3><span class="plus">+</span></summary>
-      <div class="g-body">
-        <p class="g-lead">Woods give shade, but heat still builds. Slow down with it.</p>
-        <ul>
-          <li><strong>Go early or late.</strong> Avoid roughly 11am to 3pm on hot days.</li>
-          <li><strong>Shade and water.</strong> Pick a shady spot, and carry more water than you think.</li>
-          <li><strong>Sun protection</strong> when UV is high: hat, sun cream, light long sleeves.</li>
-          <li><strong>Less effort.</strong> Gentle pace, more rest, shorter sessions.</li>
-          <li><strong>Wildfire risk.</strong> No fires or stoves in dry spells. Check local restrictions.</li>
-        </ul>
-        <p class="g-sub">Signs of heat exhaustion</p>
-        <ul>
-          <li>Headache, dizziness, feeling sick, tiredness</li>
-          <li>Heavy sweating, pale clammy skin, cramps</li>
-          <li>Fast breathing or heartbeat, strong thirst, irritability</li>
-        </ul>
-        <p>Move them somewhere cool, remove extra layers, give water or a rehydration drink, and cool their skin. They should feel better within 30 minutes.</p>
-        <p class="callout"><strong>Call 999</strong> if they're not better after 30 minutes, or if their skin is hot and dry and not sweating, they're confused or uncoordinated, very short of breath, have a fit or lose consciousness. That can be heatstroke.</p>
-      </div>
-    </details>
-    <details id="t-rain">
-      <summary><h3>Rain</h3><span class="plus">+</span></summary>
-      <div class="g-body">
-        <p class="g-lead">There's no bad weather, only wet people without a plan.</p>
-        <ul>
-          <li><strong>Proper waterproofs,</strong> top and bottom. Spares for anyone who turns up in a cotton hoodie.</li>
-          <li><strong>A tarp</strong> turns a wet session into a cosy one. Pitch it before you need it.</li>
-          <li><strong>Watch your footing.</strong> Roots, boards, rocks and slopes get slick.</li>
-          <li><strong>Rain plus cold</strong> is when people chill quickest. Shorten the sit and keep moving.</li>
-          <li><strong>Rain can be the session.</strong> The sound on the leaves, the smell of the earth. Weather is a fine co-facilitator.</li>
-        </ul>
-      </div>
-    </details>
-    <details id="t-snow">
-      <summary><h3>Snow and ice</h3><span class="plus">+</span></summary>
-      <div class="g-body">
-        <p class="g-lead">Beautiful and quiet. Also slippy, and heavy on branches.</p>
-        <ul>
-          <li><strong>Falls are the main risk.</strong> Good grip on boots. Take paths slowly. Avoid steep slopes.</li>
-          <li><strong>Heavy snow weighs down branches</strong> and can snap them. Keep clear of loaded trees, especially in wind.</li>
-          <li><strong>Freezing rain</strong> coats everything in ice. That's a day for a short, flat walk or staying in.</li>
-          <li><strong>Frozen water is never safe</strong> to walk on, however solid it looks.</li>
-          <li><strong>Getting there</strong> is often harder than being there. Allow time and check the roads.</li>
-        </ul>
-      </div>
-    </details>
-    <details id="t-fog">
-      <summary><h3>Fog</h3><span class="plus">+</span></summary>
-      <div class="g-body">
-        <p class="g-lead">Fog makes small woods feel big. Stay on paths you know.</p>
-        <ul>
-          <li><strong>Stick to familiar routes.</strong> Landmarks disappear quickly.</li>
-          <li><strong>Keep groups close</strong> and count heads more often.</li>
-          <li><strong>Take care near roads and water,</strong> where you can't see what's coming.</li>
-          <li><strong>Bring a light,</strong> even in daytime, and a charged phone.</li>
-        </ul>
-      </div>
-    </details>
-    <details id="t-flood">
-      <summary><h3>Flooding</h3><span class="plus">+</span></summary>
-      <div class="g-body">
-        <p class="g-lead">Water rises faster than you think, and hides what's underneath.</p>
-        <ul>
-          <li><strong>Never walk through flood water.</strong> 15cm of fast-flowing water can knock an adult off their feet.</li>
-          <li><strong>Hidden dangers</strong> sit under the surface: debris, holes, drains.</li>
-          <li><strong>Riverside spots</strong> can flood after heavy rain upstream, even on a dry day.</li>
-          <li><strong>Check flood warnings</strong> before you go. Links are on the Forecast tab.</li>
-        </ul>
-      </div>
-    </details>
-    <details id="t-dark">
-      <summary><h3>Dusk and dark</h3><span class="plus">+</span></summary>
-      <div class="g-body">
-        <p class="g-lead">The light goes faster under trees.</p>
-        <ul>
-          <li><strong>Know your sunset time.</strong> It's shown on the Forecast tab.</li>
-          <li><strong>Head torch for everyone</strong> if you'll be out near dusk.</li>
-          <li><strong>Choose a spot you know well</strong> for dusk sits, with an easy route out.</li>
-          <li><strong>It gets colder</strong> as the sun drops. Add a layer before you need it.</li>
-        </ul>
-      </div>
-    </details>
-    <details id="t-notice" open>
-      <summary><h3>Neurodivergent awareness</h3><span class="plus">+</span></summary>
-      <div class="g-body">
-        <p class="g-lead">Some people don't feel the cold until it's a problem. Don't wait for them to say.</p>
-        <p>Some people don't notice, or don't say, when they're getting cold, hot, hungry or thirsty. This is often linked to <em>interoception</em>, the sense of what's happening inside the body. Differences in interoception are common in autistic people and some other neurodivergent people.</p>
-        <p>It can also happen to anyone who is:</p>
-        <ul>
-          <li>Dissociating, overwhelmed or in a trauma response. This matters a lot in therapy sessions.</li>
-          <li>Deeply absorbed in what they're doing</li>
-          <li>Older, as the body's warning signals often get quieter with age</li>
-          <li>Unwell, very tired, or taking some medications</li>
-        </ul>
-        <p class="g-sub">Watch for signs you can see</p>
-        <ul>
-          <li><strong>Cold:</strong> shivering, pale or blue-tinged lips, cold hands, fumbling fingers, stiff or slow movement, going quiet or withdrawn, slurred speech.</li>
-          <li><strong>Hot:</strong> flushed or very pale face, heavy sweating, irritability, sluggishness, rubbing their head.</li>
-        </ul>
-        <p class="g-sub">Check in in ways that work</p>
-        <ul>
-          <li><strong>Ask concrete questions.</strong> "Are your hands warm or cold?" works better than "Are you OK?"</li>
-          <li><strong>Use something to compare.</strong> "Touch your hands to your cheeks. Which is colder?"</li>
-          <li><strong>Try a quick scale.</strong> "From 1 to 5, how warm are you?" or thumbs up, middle, down.</li>
-          <li><strong>Build check-ins into the rhythm</strong> of the session, rather than relying on people to speak up.</li>
-        </ul>
-        <p class="g-sub">Make it automatic</p>
-        <ul>
-          <li><strong>Layers go on at set points,</strong> like when you stop to sit. Then nobody has to decide or ask.</li>
-          <li><strong>Drink and snack breaks</strong> on a timer, not on thirst.</li>
-          <li><strong>Carry a spare kit bag</strong> with hats, gloves, a layer and a foil blanket.</li>
-          <li><strong>Ask beforehand</strong> what helps. "What does getting cold look like for you?" People often know themselves best.</li>
-          <li><strong>Use a buddy system</strong> in groups. Agree a simple signal for "I need a break".</li>
-        </ul>
-      </div>
-    </details>
-    <details id="t-sources">
-      <summary><h3>Sources</h3><span class="plus">+</span></summary>
-      <div class="g-body">
-        <ul>
-          <li><a href="https://weather.metoffice.gov.uk/warnings-and-advice/seasonal-advice/stay-safe-in-lightning" target="_blank" rel="noopener">Met Office: staying safe in lightning</a></li>
-          <li><a href="https://www.canada.ca/en/environment-climate-change/services/lightning/safety/before-and-after-a-storm.html" target="_blank" rel="noopener">Environment and Climate Change Canada: the 30-minute rule</a></li>
-          <li><a href="https://nationaltrust.org.uk/visit/norfolk/oxburgh-estate/high-wind-policy" target="_blank" rel="noopener">National Trust: an example high wind policy</a></li>
-          <li><a href="https://www.forestryengland.uk/news/public-asked-stay-away-storm-hit-forests" target="_blank" rel="noopener">Forestry England: staying away from storm-hit forests</a></li>
-          <li><a href="https://www.nidirect.gov.uk/conditions/hypothermia" target="_blank" rel="noopener">nidirect (NHS information): hypothermia</a></li>
-          <li><a href="https://111.wales.nhs.uk/Heatexhaustionandheatstroke" target="_blank" rel="noopener">NHS 111 Wales: heat exhaustion and heatstroke</a></li>
-          <li><a href="https://ukhsa.blog.gov.uk/2026/01/08/what-is-the-difference-between-weather-health-alerts-and-severe-weather-warnings/" target="_blank" rel="noopener">UKHSA: weather-health alerts explained</a></li>
-          <li><a href="https://abuhb.nhs.wales/files/childrens-ot/interoception-system-pdf/" target="_blank" rel="noopener">Aneurin Bevan NHS: understanding interoception</a></li>
-          <li><a href="https://rossendale.gov.uk/downloads/file/13916/flash-flooding-advice" target="_blank" rel="noopener">Flash flooding advice (15cm of flowing water)</a></li>
-        </ul>
-        <p>rewildingtherapies.com</p>
-      </div>
-    </details>
-  </div>
-</template>
 
 <script>
 const LOC_KEY = "top-weatherwise-place";
@@ -534,7 +375,7 @@ function verdictHTML(R, sub) {
 function render() {
   const v = $("#view");
   if (state.view === "forecast") v.innerHTML = forecastHTML();
-  else if (state.view === "tips") { v.innerHTML = ""; v.appendChild($("#tips-tpl").content.cloneNode(true)); }
+  else if (state.view === "tips") v.innerHTML = courseHTML();
   else v.innerHTML = readyHTML();
   if (state.view === "ready") bindReady();
 }
@@ -673,17 +514,157 @@ function bindReady() {
   };
 }
 
+/* ---------- Weather tips: click-through course ---------- */
+const COURSE_KEY = "top-weather-course-v1";
+const COURSE_BLURB = "short lessons on staying safe and comfortable in all weathers";
+const COURSE = [
+  { id: "wind", title: "Wind", lead: "Trees are the main risk. Look up as well as ahead.", cards: [
+    { h: "Trees are the risk", b: `<p>In the woods, wind isn't really about being blown over. It's about what falls: dead branches, weak limbs, and in strong gales whole trees.</p><p>Look up as well as ahead. Notice dead wood hanging in the canopy, cracked limbs and leaning trunks.</p>` },
+    { h: "How strong is strong?", b: `<ul><li><strong>Under 32 mph gusts.</strong> Fine for most woods. Still watch for dead branches already down.</li><li><strong>32 to 38 mph (near gale).</strong> Whole trees sway. Go with care: keep clear of big old trees, dead wood and leaning trunks. Choose a clearing or woodland edge.</li><li><strong>39 mph and over (gale).</strong> Twigs and branches start to break. Not in the woods. Many sites close from 40 mph, and fully from around 45.</li></ul>` },
+    { h: "Gusts, not averages", b: `<p>Forecasts give an average wind speed and a gust speed. In woodland, the gust is the number that matters. That's when branches come down.</p><p>Conifers and trees in full leaf catch more wind. Wet ground loosens roots. And wind makes it feel much colder, so check the "feels like" temperature too.</p>`, t: "Next time you check the forecast, find the gust figure, not just the wind speed." },
+    { h: "Shelters and fires", b: `<p>Keep shelters low and well tied. A tarp in a gust becomes a sail, and can pull pegs and poles with it.</p><p>Fires and wind don't mix. Sparks travel. On windy days keep fires small, or skip them.</p>` },
+    { h: "After a storm", b: `<p>Stay out until the woods have been checked.</p><p>Trees blown over but caught in others, called hung-up trees, can fall with little or no warning. Loose limbs can drop days later. Many sites stay closed for a while after big storms for exactly this reason.</p>` },
+  ]},
+  { id: "thunder", title: "Thunder and lightning", lead: "If you can hear thunder, lightning is close enough to reach you.", cards: [
+    { h: "Hear it, act on it", b: `<p>If you can hear thunder, lightning is within striking distance. Don't wait to see it.</p><p>Head for a building, or a car with a hard roof, straight away.</p>` },
+    { h: "Forecast thunder?", b: `<p>Move the session to another day, or choose somewhere with proper shelter close by.</p><p>Storms can build fast on warm, humid afternoons. Keep an eye on the sky as well as the forecast.</p>` },
+    { h: "Where not to be", b: `<ul><li><strong>Not under trees,</strong> lone ones especially. Stay away from tall objects and anything that conducts electricity.</li><li><strong>Not on high ground.</strong> Get off hills and ridges, down to lower ground.</li><li><strong>Not on or by open water.</strong> Head for shore.</li></ul>` },
+    { h: "Caught in the open", b: `<p>If there's truly nowhere to go, crouch low in a ball with your head tucked, keeping as little of you touching the ground as you can.</p><p>In a group, spread out a little rather than huddling together.</p>` },
+    { h: "The 30-minute rule", b: `<p>Wait 30 minutes after the last rumble of thunder before going back out.</p><p>Storms can return, and lightning can strike well behind the rain.</p>`, t: "Agree a storm plan before a summer session: where's the nearest building or car?" },
+  ]},
+  { id: "cold", title: "Cold", lead: "Sitting still is where people get cold. Plan for it before anyone feels it.", cards: [
+    { h: "Stillness is cold", b: `<p>Walking keeps us warm. Sitting still, the body makes far less heat, and the cold creeps in quietly.</p><p>That's why outdoor sits and sessions need more warmth than a walk on the same day.</p>` },
+    { h: "Layers before you need them", b: `<p>Put layers on before you sit, not when you're already cold. Hat, gloves, a warm mid layer and something windproof.</p><p>Insulate from the ground too. A sit mat makes a big difference, because the ground steals heat fast.</p>` },
+    { h: "Move and fuel", b: `<p>Keep sits shorter on cold days, with walking or movement in between.</p><p>Bring warm drinks and snacks. Food is fuel for staying warm.</p><p>Carry spare hats, gloves and a layer for anyone who turns up underdressed.</p>` },
+    { h: "Wet plus wind", b: `<p>The danger mix is wet and wind together. Damp clothes lose their warmth fast, and wind strips heat away.</p><p>A mild, wet, windy day can chill people more than a dry frosty one.</p>` },
+    { h: "Signs someone is too cold", b: `<ul><li>Shivering, cold and pale skin, tiredness</li><li>Slurred speech, fast breathing, confusion</li><li>Fumbling hands, clumsiness, going quiet</li></ul><p>Don't rely on people to tell you. See the Neurodivergent awareness lesson for why.</p>` },
+    { h: "When it's serious", b: `<p>If someone stops shivering but is still cold, or becomes confused or drowsy, it's getting serious. <strong>Call 999.</strong></p><p>Get them out of the wind and off the cold ground, into dry layers. Give a warm non-alcoholic drink and something sugary, but only if they can swallow normally.</p><p>Don't rub their limbs or use direct heat.</p>` },
+  ]},
+  { id: "heat", title: "Heat and sun", lead: "Woods give shade, but heat still builds. Slow down with it.", cards: [
+    { h: "Go early or late", b: `<p>On hot days, avoid roughly 11am to 3pm. Mornings and evenings are cooler, and often the most beautiful times outside anyway.</p>` },
+    { h: "Shade, water, sun", b: `<p>Pick a shady spot, and carry more water than you think you'll need.</p><p>When UV is high, use a hat, sun cream and light long sleeves. Light filtering through leaves still burns.</p>` },
+    { h: "Less effort, no fires", b: `<p>Go at a gentle pace, with more rest and shorter sessions.</p><p>In dry spells, no fires or stoves. Grass and woodland catch easily. Check local restrictions.</p>` },
+    { h: "Signs of heat exhaustion", b: `<ul><li>Headache, dizziness, feeling sick, tiredness</li><li>Heavy sweating, pale clammy skin, cramps</li><li>Fast breathing or heartbeat, strong thirst, irritability</li></ul><p>Move them somewhere cool, take off extra layers, give water or a rehydration drink, and cool their skin. They should feel better within 30 minutes.</p>` },
+    { h: "When to call 999", b: `<p><strong>Call 999</strong> if they're not better after 30 minutes. Or if their skin is hot and dry and not sweating, they're confused or uncoordinated, very short of breath, have a fit, or lose consciousness.</p><p>That can be heatstroke, which is an emergency.</p>` },
+  ]},
+  { id: "rain", title: "Rain", lead: "There's no bad weather, only wet people without a plan.", cards: [
+    { h: "Dress for it", b: `<p>Proper waterproofs, top and bottom, turn a miserable session into a good one.</p><p>Carry spares for anyone who turns up in a cotton hoodie. Cotton soaks up water and stays cold.</p>` },
+    { h: "Pitch a tarp", b: `<p>A tarp turns a wet session into a cosy one. Pitch it before you need it, not once everyone's already soaked.</p>` },
+    { h: "Footing and chill", b: `<p>Roots, boardwalks, rocks and slopes all get slick in the wet. Slow down.</p><p>Rain plus cold is when people chill quickest. Shorten the sits and keep moving.</p>` },
+    { h: "Rain can be the session", b: `<p>The sound on the leaves. The smell of the earth after a dry spell. The way the woods go quiet.</p><p>Weather is a fine co-facilitator. Some of the best sessions happen in the rain.</p>`, t: "Next time it rains, step outside for five minutes and just listen." },
+  ]},
+  { id: "snow", title: "Snow and ice", lead: "Beautiful and quiet. Also slippy, and heavy on branches.", cards: [
+    { h: "Falls are the main risk", b: `<p>Good grip on boots matters more than anything. Take paths slowly and avoid steep slopes.</p>` },
+    { h: "Loaded branches", b: `<p>Heavy snow weighs branches down, and can snap them. Keep clear of loaded trees, especially if it's windy too.</p>` },
+    { h: "Freezing rain and frozen water", b: `<p>Freezing rain coats everything in ice. That's a day for a short, flat walk, or staying in.</p><p>Frozen ponds and lakes are never safe to walk on, however solid they look.</p>` },
+    { h: "Getting there", b: `<p>Often the journey is harder than the woods. Allow extra time, and check the roads before you set off.</p>` },
+  ]},
+  { id: "fog", title: "Fog", lead: "Fog makes small woods feel big. Stay on paths you know.", cards: [
+    { h: "Familiar routes", b: `<p>Landmarks disappear quickly in fog. Stick to routes you know well.</p><p>It can be a magical time to be out, as long as you know your way home.</p>` },
+    { h: "Keep close, stay seen", b: `<p>In groups, keep close and count heads more often.</p><p>Take care near roads and water, where you can't see what's coming. Bring a light, even in daytime, and a charged phone.</p>` },
+  ]},
+  { id: "flood", title: "Flooding", lead: "Water rises faster than you think, and hides what's underneath.", cards: [
+    { h: "Never walk through flood water", b: `<p>Just 15cm of fast-flowing water can knock an adult off their feet.</p><p>Hidden dangers sit under the surface too: debris, holes and open drains.</p>` },
+    { h: "Rivers rise from afar", b: `<p>Riverside spots can flood after heavy rain upstream, even when it's dry where you are.</p><p>Check flood warnings before you go. The links are on the Forecast tab.</p>` },
+  ]},
+  { id: "dark", title: "Dusk and dark", lead: "The light goes faster under trees.", cards: [
+    { h: "Know your sunset", b: `<p>Under trees, dusk comes earlier than in the open. Check your sunset time on the Forecast tab, and plan to be out before the light goes.</p>` },
+    { h: "If you're out late", b: `<p>Bring a head torch for everyone. Choose a spot you know well for dusk sits, with an easy route out.</p><p>It gets colder as the sun drops. Add a layer before you need it.</p>` },
+  ]},
+  { id: "notice", title: "Neurodivergent awareness", lead: "Some people don't feel the cold until it's a problem. Don't wait for them to say.", cards: [
+    { h: "Why some people don't notice", b: `<p>Some people don't notice, or don't say, when they're getting cold, hot, hungry or thirsty.</p><p>This is often linked to <em>interoception</em>, the sense of what's happening inside the body. Differences in interoception are common in autistic people and some other neurodivergent people.</p>` },
+    { h: "It's not only neurodivergence", b: `<p>It can also happen to anyone who is:</p><ul><li>Dissociating, overwhelmed or in a trauma response. This matters a lot in therapy sessions.</li><li>Deeply absorbed in what they're doing</li><li>Older, as the body's warning signals often get quieter with age</li><li>Unwell, very tired, or taking some medications</li></ul>` },
+    { h: "Watch for signs you can see", b: `<ul><li><strong>Cold:</strong> shivering, pale or blue-tinged lips, cold hands, fumbling fingers, stiff or slow movement, going quiet or withdrawn, slurred speech.</li><li><strong>Hot:</strong> a flushed or very pale face, heavy sweating, irritability, sluggishness, rubbing their head.</li></ul>` },
+    { h: "Check in in ways that work", b: `<ul><li><strong>Ask concrete questions.</strong> "Are your hands warm or cold?" works better than "Are you OK?"</li><li><strong>Use something to compare.</strong> "Touch your hands to your cheeks. Which is colder?"</li><li><strong>Try a quick scale.</strong> "From 1 to 5, how warm are you?" or thumbs up, middle, down.</li></ul>`, t: "Try the hands-to-cheeks check on yourself at your next sit." },
+    { h: "Make it automatic", b: `<p>Build check-ins into the rhythm of the session, rather than relying on people to speak up.</p><ul><li><strong>Layers go on at set points,</strong> like when you stop to sit. Then nobody has to decide or ask.</li><li><strong>Drink and snack breaks</strong> on a timer, not on thirst.</li><li><strong>A spare kit bag</strong> with hats, gloves, a layer and a foil blanket.</li></ul>` },
+    { h: "Ask beforehand", b: `<p>Ask people what helps before you head out: "What does getting cold look like for you?" People often know themselves best.</p><p>In groups, use a buddy system, and agree a simple signal for "I need a break".</p>` },
+  ]},
+  { id: "sources", title: "Sources", lead: "Where the safety guidance comes from.", cards: [
+    { h: "Read more", b: `<ul>
+      <li><a href="https://weather.metoffice.gov.uk/warnings-and-advice/seasonal-advice/stay-safe-in-lightning" target="_blank" rel="noopener">Met Office: staying safe in lightning</a></li>
+      <li><a href="https://www.canada.ca/en/environment-climate-change/services/lightning/safety/before-and-after-a-storm.html" target="_blank" rel="noopener">Environment and Climate Change Canada: the 30-minute rule</a></li>
+      <li><a href="https://www.weather.gov/safety/lightning-tips" target="_blank" rel="noopener">US National Weather Service: lightning safety tips</a></li>
+      <li><a href="https://nationaltrust.org.uk/visit/norfolk/oxburgh-estate/high-wind-policy" target="_blank" rel="noopener">National Trust: an example high wind policy</a></li>
+      <li><a href="https://www.forestryengland.uk/news/public-asked-stay-away-storm-hit-forests" target="_blank" rel="noopener">Forestry England: storm-hit forests</a></li>
+      <li><a href="https://www.nidirect.gov.uk/conditions/hypothermia" target="_blank" rel="noopener">nidirect (NHS information): hypothermia</a></li>
+      <li><a href="https://111.wales.nhs.uk/Heatexhaustionandheatstroke" target="_blank" rel="noopener">NHS 111 Wales: heat exhaustion and heatstroke</a></li>
+      <li><a href="https://ukhsa.blog.gov.uk/2026/01/08/what-is-the-difference-between-weather-health-alerts-and-severe-weather-warnings/" target="_blank" rel="noopener">UKHSA: weather-health alerts explained</a></li>
+      <li><a href="https://abuhb.nhs.wales/files/childrens-ot/interoception-system-pdf/" target="_blank" rel="noopener">Aneurin Bevan NHS: understanding interoception</a></li>
+      <li><a href="https://rossendale.gov.uk/downloads/file/13916/flash-flooding-advice" target="_blank" rel="noopener">Flash flooding advice</a></li>
+    </ul>` },
+    { h: "Read the sky before you go", b: `<p>That's the course. Come back to any lesson whenever the weather turns.</p><p>A guide, not a guarantee. Use your own judgement, and check official warnings.</p><p>rewildingtherapies.com</p>` },
+  ]},
+];
+
+const course = { lesson: null, card: 0, finished: false };
+function courseDone() { try { return new Set(JSON.parse(localStorage.getItem(COURSE_KEY)) || []); } catch (e) { return new Set(); } }
+function markDone(id) { const s = courseDone(); s.add(id); try { localStorage.setItem(COURSE_KEY, JSON.stringify([...s])); } catch (e) {} }
+function courseHTML() {
+  const done = courseDone();
+  if (!course.lesson) {
+    const n = COURSE.filter(l => done.has(l.id)).length;
+    const next = COURSE.find(l => !done.has(l.id)) || COURSE[0];
+    return `<div class="course">
+      <div class="c-head"><h2>Weather tips</h2><p class="toast">${COURSE.length} ${COURSE_BLURB}. A few minutes each. Take them in order, or dip in.</p>
+        <div class="c-prog" role="progressbar" aria-valuemin="0" aria-valuemax="${COURSE.length}" aria-valuenow="${n}"><span style="width:${Math.round(n / COURSE.length * 100)}%"></span></div>
+        <div class="row spread"><span class="toast">${n} of ${COURSE.length} done</span><button class="btn primary" data-lesson="${next.id}">${n ? (n === COURSE.length ? "Start again" : "Continue") : "Start"}: ${esc(next.title)}</button></div></div>
+      <ol class="lessons">${COURSE.map((l, i) => `<li><button class="lesson-row" data-lesson="${l.id}">
+        <span class="l-num ${done.has(l.id) ? "done" : ""}" aria-hidden="true">${done.has(l.id) ? "✓" : i + 1}</span>
+        <span class="l-main"><span class="l-title">${esc(l.title)}</span><span class="l-sub">${esc(l.lead)}</span></span>
+        <span class="l-meta">${l.cards.length} cards${done.has(l.id) ? '<span class="sr"> · done</span>' : ""}</span></button></li>`).join("")}</ol></div>`;
+  }
+  const li = COURSE.findIndex(l => l.id === course.lesson), L = COURSE[li];
+  const top = `<div class="row spread"><button class="btn ghost" data-course="menu">← All lessons</button><span class="toast">Lesson ${li + 1} of ${COURSE.length}</span></div>`;
+  if (course.finished) {
+    const nx = COURSE[li + 1];
+    return `<div class="course">${top}<article class="c-card c-end"><span class="c-count">Lesson done</span><h3>${esc(L.title)}</h3><p>Nice work. Come back to it any time.</p>
+      <div class="row">${nx ? `<button class="btn primary" data-lesson="${nx.id}">Next: ${esc(nx.title)}</button>` : ""}<button class="btn" data-course="journal">Back to the forecast</button><button class="btn ghost" data-course="menu">All lessons</button></div></article></div>`;
+  }
+  const C = L.cards[course.card], last = course.card === L.cards.length - 1;
+  return `<div class="course">${top}
+    <div class="c-lesson"><h2>${esc(L.title)}</h2><p class="c-lead">${esc(L.lead)}</p></div>
+    <article class="c-card" id="c-card" aria-live="polite">
+      <span class="c-count">${course.card + 1} of ${L.cards.length}</span>
+      <h3>${esc(C.h)}</h3><div class="c-body">${C.b}</div>
+      ${C.t ? `<div class="c-try"><span>Try this</span><p>${esc(C.t)}</p></div>` : ""}
+    </article>
+    <div class="c-dots" aria-hidden="true">${L.cards.map((_, i) => `<i class="${i === course.card ? "on" : i < course.card ? "past" : ""}"></i>`).join("")}</div>
+    <div class="row spread"><button class="btn" data-course="back" ${course.card === 0 ? "disabled" : ""}>Back</button>
+      <button class="btn primary" data-course="next">${last ? "Finish lesson" : "Next"}</button></div>
+  </div>`;
+}
+function openLesson(id, card) { course.lesson = id; course.card = card || 0; course.finished = false; go("tips"); }
+function courseNav(dir) {
+  const L = COURSE.find(l => l.id === course.lesson); if (!L || course.finished) return;
+  if (dir > 0) { if (course.card < L.cards.length - 1) course.card++; else { markDone(L.id); course.finished = true; } }
+  else if (course.card > 0) course.card--;
+  render(); const c = document.getElementById("c-card") || document.querySelector(".c-end"); if (c) c.scrollIntoView({ block: "nearest" });
+}
+let touchX = null;
+document.addEventListener("touchstart", e => { if (state.view === "tips" && course.lesson && e.target.closest(".c-card")) touchX = e.touches[0].clientX; }, { passive: true });
+document.addEventListener("touchend", e => { if (touchX === null) return; const dx = e.changedTouches[0].clientX - touchX; touchX = null; if (Math.abs(dx) > 50) courseNav(dx < 0 ? 1 : -1); });
+document.addEventListener("keydown", e => { if (state.view !== "tips" || !course.lesson || /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return; if (e.key === "ArrowRight") courseNav(1); if (e.key === "ArrowLeft") courseNav(-1); });
+
+
+
 /* ---------- Events ---------- */
 function go(view, jump) {
   state.view = view;
   document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", String(t.dataset.view === view)));
   render();
-  if (jump) { const d = document.getElementById(jump); if (d) { d.open = true; d.scrollIntoView({ behavior: "smooth", block: "start" }); } }
-  else window.scrollTo({ top: 0 });
+  window.scrollTo({ top: 0 });
 }
 document.addEventListener("click", e => {
   const tab = e.target.closest(".tab"); if (tab) { go(tab.dataset.view); return; }
-  const j = e.target.closest("[data-jump]"); if (j) { e.preventDefault(); go("tips", j.dataset.jump); return; }
+  const j = e.target.closest("[data-jump]"); if (j) { e.preventDefault(); const id = j.dataset.jump.replace(/^t-/, ""); if (COURSE.some(l => l.id === id)) openLesson(id, 0); else go("tips"); return; }
+  const ls = e.target.closest("[data-lesson]"); if (ls) { openLesson(ls.dataset.lesson, 0); return; }
+  const cc = e.target.closest("[data-course]"); if (cc) {
+    const k = cc.dataset.course;
+    if (k === "menu") { course.lesson = null; course.finished = false; render(); window.scrollTo({ top: 0 }); }
+    else if (k === "journal") { course.lesson = null; course.finished = false; go("forecast"); }
+    else courseNav(k === "next" ? 1 : -1);
+    return;
+  }
   const pick = e.target.closest("[data-pick]"); if (pick) { setPlace(state.results[+pick.dataset.pick]); state.changing = false; return; }
   if (e.target.closest("#geo")) { state.changing = false; useMyLocation(); return; }
   if (e.target.closest("#change")) { state.changing = true; render(); const q = $("#q"); if (q) q.focus(); return; }
